@@ -1,0 +1,20 @@
+ARG CLI_IMAGE
+FROM ${CLI_IMAGE} as cli
+
+FROM httpd:2.4
+
+COPY ./config/site.conf /usr/local/apache2/conf/extra/httpd-vhosts.conf
+COPY ./config/httpd.conf /usr/local/apache2/conf/httpd.conf
+
+COPY --from=cli /app /usr/local/apache2/htdocs/
+
+RUN chown -hR root:www-data /usr/local/apache2/htdocs/
+
+EXPOSE 8080
+EXPOSE 443
+
+# Define where the Drupal Root is located
+ENV WEBROOT=docroot \
+    AMAZEEIO=AMAZEEIO \
+    AMAZEEIO_HTTP_PORT=8080 \
+    AMAZEEIO_URL=comfandi.docker.amazee.io
